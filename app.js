@@ -1,24 +1,14 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import "dotenv/config";
-import jwt from "jsonwebtoken";
+import { userRouter } from "./routes/userRouter.js";
+import { postRouter } from "./routes/postsRouter.js";
 
 const app = express();
 
-app.get("/users", (req, res) => {
-  // get all users
-})
-
-app.get("/users/:id", (req, res) => {
-  // get a single user
-})
-
-app.post("users/register", (req, res) => {
-  // register a new user
-})
-
-app.post("/users/login", (req, res) => {
-  // authenticate user JWT
-})
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/users", userRouter);
+app.use("/posts", postRouter);
 
 app.listen(process.env.PORT, () =>
   console.log(`listening on port ${process.env.PORT}`)
