@@ -1,31 +1,28 @@
 import { Router } from "express";
+import {
+  createPost,
+  deletePost,
+  getPosts,
+  getSpecificPost,
+  updatePost,
+} from "../controllers/postController.js";
+import { authenticateToken } from "../authenticateToken.js";
+
 const postRouter = Router({ mergeParams: true });
 
 // get all posts
-postRouter.get("/");
+postRouter.get("/", getPosts);
 
 // get specific post
-postRouter.get("/:id");
+postRouter.get("/:id", getSpecificPost);
 
 // create new post (authenticated users)
-postRouter.post("/");
+postRouter.post("/", authenticateToken, createPost);
 
 // update a post (post owner only)
-postRouter.put("/:id");
+postRouter.put("/:id", authenticateToken, updatePost);
 
 // delete a post (post owner only)
-postRouter.delete("/:id");
-
-// get all comments for a post
-postRouter.get("/:id/comments");
-
-// add a comment to a post (authenticated users only)
-postRouter.post("/:id/comments");
-
-// update a comment (comment owner only)
-postRouter.put("/:id/comments/:commentId");
-
-// delete a comment (comment owner only)
-postRouter.delete("/:id/comments/:commentId");
+postRouter.delete("/:id", authenticateToken, deletePost);
 
 export { postRouter };

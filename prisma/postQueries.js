@@ -11,7 +11,7 @@ const getAllPosts = async () => {
   return posts;
 };
 
-const getSinglePost = async (req, res) => {
+const getSinglePost = async (id) => {
   const post = await prisma.post.findUnique({
     where: {
       id: id,
@@ -25,4 +25,59 @@ const getSinglePost = async (req, res) => {
   return post;
 };
 
-export { getAllPosts, getSinglePost };
+const createNewPost = async (id, title, content, published) => {
+  const post = await prisma.post.create({
+    data: {
+      title,
+      content,
+      published,
+      author: {
+        connect: {
+          id: id,
+        },
+      },
+      include: {
+        author: true,
+      },
+    },
+  });
+  console.log("new post", post);
+  return post;
+};
+
+const updateUserPost = async (id, title, content, published) => {
+  const post = await prisma.post.update({
+    where: {
+      id: id,
+    },
+    data: {
+      title: title,
+      content: content,
+      published: published,
+    },
+    include: {
+      author: true,
+      comments: true,
+    },
+  });
+  console.log("updated post", post);
+  return post;
+};
+
+const deleteUserPost = async (id) => {
+  const deletedPost = await prisma.post.delete({
+    where: {
+      id: id,
+    },
+  });
+  console.log("deleted post", deletedPost);
+  return deletedPost;
+};
+
+export {
+  getAllPosts,
+  getSinglePost,
+  createNewPost,
+  updateUserPost,
+  deleteUserPost,
+};
