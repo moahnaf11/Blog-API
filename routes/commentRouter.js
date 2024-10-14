@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {
   createComment,
+  deleteComment,
   getAllComments,
+  updateComment,
 } from "../controllers/commentController.js";
 import { authenticateToken } from "../authenticateToken.js";
 const commentRouter = Router({ mergeParams: true });
@@ -13,9 +15,9 @@ commentRouter.get("/", getAllComments);
 commentRouter.post("/", authenticateToken, createComment);
 
 // update a comment (comment owner only)
-commentRouter.put("/:commentId", );
+commentRouter.put("/:commentId", authenticateToken, updateComment);
 
 // delete a comment (comment owner only)
-commentRouter.delete("/:commentId");
+commentRouter.delete("/:commentId", authenticateToken, deleteComment);
 
 export { commentRouter };

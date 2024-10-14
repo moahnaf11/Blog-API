@@ -1,6 +1,6 @@
 import { prisma } from "./prismaClient.js";
 
-const getAllCommenstForAPost = async (id) => {
+const getAllCommentsForAPost = async (id) => {
   const comments = await prisma.comment.findMany({
     where: {
       postId: id,
@@ -34,6 +34,8 @@ const createNewComment = async (id, text, userId) => {
       user: true,
     },
   });
+  console.log("comment created", comment);
+  return comment;
 };
 
 const updateUserComment = async (id, text) => {
@@ -54,7 +56,7 @@ const updateUserComment = async (id, text) => {
 };
 
 const getSingleComment = async (id) => {
-  const singleComment = prisma.comment.findUnique({
+  const singleComment = await prisma.comment.findUnique({
     where: {
       id: id,
     },
@@ -67,4 +69,20 @@ const getSingleComment = async (id) => {
   return singleComment;
 };
 
-export { getAllCommenstForAPost, createNewComment, updateUserComment, getSingleComment };
+const deleteUserComment = async (id) => {
+  const deletedComment = await prisma.comment.delete({
+    where: {
+      id: id,
+    },
+  });
+  console.log("deleted comment", deletedComment);
+  return deletedComment;
+};
+
+export {
+  getAllCommentsForAPost,
+  createNewComment,
+  updateUserComment,
+  getSingleComment,
+  deleteUserComment,
+};

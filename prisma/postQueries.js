@@ -36,16 +36,16 @@ const createNewPost = async (id, title, content, published) => {
           id: id,
         },
       },
-      include: {
-        author: true,
-      },
+    },
+    include: {
+      author: true,
     },
   });
   console.log("new post", post);
   return post;
 };
 
-const updateUserPost = async (id, title, content, published) => {
+const updateUserPost = async (id, title, content, isPublished) => {
   const post = await prisma.post.update({
     where: {
       id: id,
@@ -53,7 +53,7 @@ const updateUserPost = async (id, title, content, published) => {
     data: {
       title: title,
       content: content,
-      published: published,
+      published: isPublished,
     },
     include: {
       author: true,

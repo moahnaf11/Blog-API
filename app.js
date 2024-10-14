@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
-app.use("posts/:id/comments", commentRouter);
+app.use("/posts/:id/comments", commentRouter);
 
 app.listen(process.env.PORT, () =>
   console.log(`listening on port ${process.env.PORT}`)

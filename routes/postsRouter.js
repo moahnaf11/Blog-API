@@ -10,6 +10,16 @@ import { authenticateToken } from "../authenticateToken.js";
 
 const postRouter = Router({ mergeParams: true });
 
+// middleware to check role of user
+const checkRole = async (req, res, next) => {
+  console.log("req.user object", req.user)
+  if (req.user.role === "AUTHOR") {
+    return next();
+  } else {
+    res.json({ error: "only authors can create/ update and delete posts" });
+  }
+};
+
 // get all posts
 postRouter.get("/", getPosts);
 
@@ -17,12 +27,12 @@ postRouter.get("/", getPosts);
 postRouter.get("/:id", getSpecificPost);
 
 // create new post (authenticated users)
-postRouter.post("/", authenticateToken, createPost);
+postRouter.post("/", authenticateToken, checkRole, createPost);
 
 // update a post (post owner only)
-postRouter.put("/:id", authenticateToken, updatePost);
+postRouter.put("/:id", authenticateToken, checkRole, updatePost);
 
 // delete a post (post owner only)
-postRouter.delete("/:id", authenticateToken, deletePost);
+postRouter.delete("/:id", authenticateToken, checkRole, deletePost);
 
 export { postRouter };

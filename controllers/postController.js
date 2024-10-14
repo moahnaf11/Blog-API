@@ -25,7 +25,8 @@ const getSpecificPost = async (req, res) => {
 const createPost = async (req, res) => {
   const id = req.user.id;
   const { title, content, published } = req.body;
-  const post = await createNewPost(id, title, content, published);
+  const isPublished = published === "true";
+  const post = await createNewPost(id, title, content, isPublished);
   if (!post) {
     return res.status(404).json({ error: "post not created" });
   }

@@ -35,8 +35,8 @@ const postLogin = async (req, res) => {
       // error incorrect password
       return res.status(401).json({ error: "incorrect password" });
     } else {
-      const { id, firstName, lastName, email } = user;
-      const payload = { id, firstName, lastName, email };
+      const { id, firstName, lastName, email, role } = user;
+      const payload = { id, firstName, lastName, email, role };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
