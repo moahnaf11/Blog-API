@@ -8,13 +8,13 @@ function Header() {
         <nav>
           <ul className="flex items-center gap-3">
             <li>
-              <NavLink className="font-custom inline-block font-bold border-2 border-black p-2" to="/login">Login</NavLink>
+              <NavLink className="font-custom hover:bg-white inline-block font-bold border-2 border-black p-2" to="/login">Login</NavLink>
             </li>
             <li>
-              <NavLink className="font-custom inline-block font-bold border-2 border-black p-2" to="/register">Register</NavLink>
+              <NavLink className="font-custom hover:bg-white inline-block font-bold border-2 border-black p-2" to="/register">Register</NavLink>
             </li>
             <li>
-              <NavLink className="font-custom inline-block font-bold border-2 border-black p-2"  to="/logout">Log out</NavLink>
+              <NavLink className="font-custom hover:bg-white inline-block font-bold border-2 border-black p-2"  to="/logout">Log out</NavLink>
             </li>
           </ul>
         </nav>
