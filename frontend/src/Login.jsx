@@ -6,6 +6,25 @@ function Login() {
     email: "",
     password: "",
   });
+
+  function handleChange(e) {
+    setLoginForm((prev) => {
+      const data = {
+        ...prev,
+        [e.target.name]: e.target.value,
+      };
+      console.log("login form data", data);
+      return data;
+    });
+  }
+
+  function clearFormFields() {
+    setLoginForm({
+      email: "",
+      password: "",
+    });
+  }
+
   return (
     <main className="p-3 text-black min-h-screen flex justify-center items-center bg-gray-700">
       <form
@@ -16,7 +35,6 @@ function Login() {
         <h1 className="font-custom font-bold text-xl border-b-2 border-black max-w-max">
           Log In
         </h1>
-        
 
         <div className="flex flex-col">
           <label htmlFor="email">
@@ -28,6 +46,8 @@ function Login() {
             id="email"
             name="email"
             placeholder="ahnaf@example.com"
+            value={loginForm.email}
+            onChange={(e) => handleChange(e)}
             required
           />
           <span></span>
@@ -43,6 +63,8 @@ function Login() {
             id="password"
             name="password"
             placeholder="*****"
+            value={loginForm.password}
+            onChange={(e) => handleChange(e)}
             required
           />
           <span></span>
@@ -68,6 +90,7 @@ function Login() {
           <button
             className="border-2 font-custom font-bold hover:bg-white rounded-full flex-1 py-2 bg-gray-400 border-gray-400"
             type="reset"
+            onClick={clearFormFields}
           >
             Clear
           </button>
