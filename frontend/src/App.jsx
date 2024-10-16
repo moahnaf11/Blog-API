@@ -3,10 +3,17 @@ import { Header } from "./Header";
 import { Outlet } from "react-router-dom";
 
 function App() {
+  const [user, setUser] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "",
+  });
   return (
     <>
-      <Header></Header>
-      <Outlet></Outlet>
+      <Header id={user.id} />
+      <Outlet context={{setUser, user}} />
     </>
   );
 }

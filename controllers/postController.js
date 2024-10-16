@@ -7,6 +7,7 @@ import {
 } from "../prisma/postQueries.js";
 
 const getPosts = async (req, res) => {
+  console.log("get called")
   const posts = await getAllPosts();
   if (!posts.length) {
     return res.status(404).json({ error: "no posts" });

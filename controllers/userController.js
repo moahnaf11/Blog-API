@@ -37,9 +37,7 @@ const postLogin = async (req, res) => {
     } else {
       const { id, firstName, lastName, email, role } = user;
       const payload = { id, firstName, lastName, email, role };
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(payload, process.env.JWT_SECRET);
       res.json({ token });
     }
   }

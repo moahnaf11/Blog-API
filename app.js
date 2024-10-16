@@ -3,8 +3,11 @@ import "dotenv/config";
 import { userRouter } from "./routes/userRouter.js";
 import { postRouter } from "./routes/postsRouter.js";
 import { commentRouter } from "./routes/commentRouter.js";
+import cors from "cors";
 
 const app = express();
+
+app.use(cors()); // Enable CORS for all routes
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

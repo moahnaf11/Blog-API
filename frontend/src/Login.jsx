@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 function Login() {
+  const { setUser } = useOutletContext();
+  const navigate = useNavigate();
   const [loginForm, setLoginForm] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
 
   function handleChange(e) {
     setLoginForm((prev) => {
@@ -23,11 +27,44 @@ function Login() {
       email: "",
       password: "",
     });
+    setError("");
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const response = await fetch("http://localhost:3000/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginForm),
+    });
+
+    if (!response.ok) {
+      let message = await response.json();
+      setError(message.error);
+    } else {
+      let token = await response.json();
+      localStorage.setItem("token", token.token);
+      console.log("token stored", localStorage.getItem("token"));
+      const decodedToken = jwtDecode(token.token);
+      console.log("payload", decodedToken);
+      setUser((prev) => {
+        const updateduser = {
+          ...prev,
+          ...decodedToken,
+        };
+        console.log("updated user", updateduser);
+        return updateduser;
+      });
+      navigate("/");
+    }
   }
 
   return (
     <main className="p-3 text-black min-h-screen flex justify-center items-center bg-gray-700">
       <form
+        onSubmit={(e) => handleSubmit(e)}
         className="w-[90%] md:w-[50%] flex flex-col bg-white gap-3 p-3 rounded-lg shadow-md shadow-white"
         action="#"
         method="post"
@@ -50,7 +87,9 @@ function Login() {
             onChange={(e) => handleChange(e)}
             required
           />
-          <span></span>
+          <span className="text-red-600">
+            {error === "user not found" ? error : ""}
+          </span>
         </div>
 
         <div className="flex flex-col">
@@ -67,13 +106,15 @@ function Login() {
             onChange={(e) => handleChange(e)}
             required
           />
-          <span></span>
+          <span className="text-red-600">
+            {error === "user not found" ? "" : error}
+          </span>
         </div>
 
         <div className="mt-4 flex justify-between gap-8 items-center">
           Don't have an account?
           <Link
-            className="border-2 font-custom font-bold hover:bg-white rounded-full px-10 py-2 bg-blue-400 border-blue-400"
+            className="border-2 font-custom font-bold hover:bg-white rounded-full px-2 py-2 bg-blue-400 border-blue-400"
             to="/register"
           >
             Register
