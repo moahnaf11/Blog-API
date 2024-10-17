@@ -18,7 +18,11 @@ const getSinglePost = async (id) => {
     },
     include: {
       author: true,
-      comments: true,
+      comments: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
   console.log("single post", post);

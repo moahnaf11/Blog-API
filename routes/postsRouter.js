@@ -12,11 +12,13 @@ const postRouter = Router({ mergeParams: true });
 
 // middleware to check role of user
 const checkRole = async (req, res, next) => {
-  console.log("req.user object", req.user)
+  console.log("req.user object", req.user);
   if (req.user.role === "AUTHOR") {
     return next();
   } else {
-    res.json({ error: "only authors can create/ update and delete posts" });
+    res
+      .status(401)
+      .json({ error: "only authors can create/ update and delete posts" });
   }
 };
 
