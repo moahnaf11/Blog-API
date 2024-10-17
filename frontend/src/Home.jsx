@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
-import commentIcon from "../public/comment.svg";
+import commentIcon from "/comment.svg";
 function Home() {
   const { user } = useOutletContext();
   const [posts, setPosts] = useState([]);
@@ -9,15 +9,19 @@ function Home() {
     const controller = new AbortController();
     const signal = controller.signal;
     async function fetchPosts() {
-      const response = await fetch("http://localhost:3000/posts", {
-        method: "GET",
-        signal,
-      });
+      try {
+        const response = await fetch("http://localhost:3000/posts", {
+          method: "GET",
+          signal,
+        });
 
-      if (response.ok) {
-        const posts = await response.json();
-        console.log(posts);
-        setPosts(posts);
+        if (response.ok) {
+          const posts = await response.json();
+          console.log(posts);
+          setPosts(posts);
+        }
+      } catch (err) {
+        console.log(err);
       }
     }
     fetchPosts();

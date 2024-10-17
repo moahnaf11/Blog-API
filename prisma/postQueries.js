@@ -4,7 +4,11 @@ const getAllPosts = async () => {
   const posts = await prisma.post.findMany({
     include: {
       author: true,
-      comments: true,
+      comments: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
   console.log("all posts", posts);
