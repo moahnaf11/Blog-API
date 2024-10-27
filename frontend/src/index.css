@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'intro_rust_gbase_2_line';
-  src: url('../fonts/introrustg-base2line-webfont.woff2') format('woff2');
+  font-family: "intro_rust_gbase_2_line";
+  src: url("../fonts/introrustg-base2line-webfont.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
 }
@@ -8,3 +8,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+::backdrop {
+  background-color: gray;
+  opacity: 0.7;
+}
