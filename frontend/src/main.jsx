@@ -8,13 +8,14 @@ import "./index.css";
 import { Home } from "./Home.jsx";
 import { ViewPost } from "./ViewPost.jsx";
 
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
       {
-        index: true, 
+        index: true,
         element: <Home />,
       },
       {
@@ -28,8 +29,7 @@ const router = createBrowserRouter([
       {
         path: "post",
         element: <ViewPost />,
-
-      }
+      },
     ],
   },
 ]);

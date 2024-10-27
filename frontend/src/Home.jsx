@@ -4,6 +4,9 @@ import commentIcon from "/comment.svg";
 function Home() {
   const { user } = useOutletContext();
   const [posts, setPosts] = useState([]);
+  const [displayPublished, setDisplayPublished] = useState(true);
+  const [currentPost, setCurrentPost] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
   const dialogRef = useRef(null);
 
   useEffect(() => {
@@ -36,8 +39,12 @@ function Home() {
 
   // Function to delete a post
   const deletePost = async (postId) => {
-    const controller = new AbortController();
-    const signal = controller.signal;
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
+    if (!isConfirmed) {
+      return;
+    }
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(`http://localhost:3000/posts/${postId}`, {
@@ -46,7 +53,6 @@ function Home() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        signal,
       });
 
       if (response.ok) {
@@ -64,21 +70,40 @@ function Home() {
 
   const handleSubmitPost = async (e) => {
     e.preventDefault();
-    const controller = new AbortController();
-    const signal = controller.signal;
+    closeDialog();
     const token = localStorage.getItem("token");
 
-    try {
-      const response = await fetch(`http://localhost:3000/posts`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        signal,
-      });
-    } catch (err) {
-      console.log("Error creating new post", err);
+    const title = e.target.title.value;
+    const content = e.target.content.value;
+    const published = e.target.published.checked ? "true" : "false";
+
+    const body = {
+      title,
+      content,
+      published,
+    };
+
+    if (!isEdit) {
+      try {
+        const response = await fetch(`http://localhost:3000/posts`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (response.ok) {
+          const post = await response.json();
+          console.log("post created", post);
+          setPosts((prev) => [...prev, post]);
+        }
+      } catch (err) {
+        console.log("Error creating new post", err);
+      }
+    } else {
+      // update post
     }
   };
 
@@ -91,7 +116,11 @@ function Home() {
           </h2>
           {user.role === "AUTHOR" ? (
             <button
-              onClick={openDialog}
+              onClick={() => {
+                setIsEdit(false);
+                setCurrentPost(null);
+                openDialog();
+              }}
               className="border shrink-0 hover:bg-white hover:text-black font-bold font-custom text-xs border-white px-1 py-2 sm:px-3 sm:text-[16px] rounded-full"
             >
               Create Post
@@ -99,11 +128,17 @@ function Home() {
           ) : null}
         </div>
       ) : null}
-
+      {/* new post dialog */}
       <dialog className="absolute min-w-[70%] rounded-lg" ref={dialogRef}>
-        <form action="" className="flex flex-col gap-4 p-3">
+        <form
+          action="#"
+          onSubmit={(e) => handleSubmitPost(e)}
+          className="flex flex-col gap-4 p-3"
+        >
           <div className="flex justify-between items-center">
-            <h2 className="font-custom font-bold mb-4">Create New Blog Post</h2>
+            <h2 className="font-custom font-bold mb-4">
+              {isEdit ? "Update Blog Post" : "Create New Blog Post"}
+            </h2>
             <button onClick={closeDialog} className="hover:text-red-600">
               <svg
                 className="size-6"
@@ -140,6 +175,7 @@ function Home() {
               name="title"
               id="title"
               placeholder="title"
+              defaultValue={currentPost ? currentPost.title : ""}
               required
             />
           </div>
@@ -148,96 +184,271 @@ function Home() {
             <label htmlFor="content">
               Content <span className="text-red-600">*</span>
             </label>
-            <textarea className="border py-1 border-black px-1" name="content" id="content"></textarea>
+            <textarea
+              className="border py-1 border-black px-1"
+              name="content"
+              id="content"
+              defaultValue={currentPost ? currentPost.content : ""}
+              required
+            ></textarea>
           </div>
 
           <div className="flex justify-between items-center">
             <label htmlFor="published">Do you want to publish?</label>
-            <input className="w-5 h-5" type="checkbox" name="published" id="published" />
+            <input
+              className="w-5 h-5"
+              type="checkbox"
+              name="published"
+              id="published"
+              checked={currentPost ? currentPost.published : false}
+            />
           </div>
 
           <div className="flex">
-            <button className="flex-1 py-2 rounded-full font-bold font-custom hover:bg-white bg-green-600 border border-green-600" onClick={(e) => handleSubmitPost(e)} type="submit">
-              Add Post
+            <button
+              className="flex-1 py-2 rounded-full font-bold font-custom hover:bg-white bg-green-600 border border-green-600"
+              type="submit"
+            >
+              {isEdit ? "Update Post" : "Add Post"}
             </button>
           </div>
         </form>
       </dialog>
 
       <section className="min-h-screen p-3">
-        <h2 className="font-custom font-bold mb-5">All Blogs</h2>
+        <div className="flex mb-5 justify-between items-center">
+          <h2 className="font-custom font-bold">All Blogs</h2>
+          <button
+            className="border px-3 py-2 rounded-full text-sm shrink-0 font-custom font-bold"
+            onClick={() => setDisplayPublished((prev) => !prev)}
+          >
+            {displayPublished
+              ? "View Unpublished Posts"
+              : "View Published Posts"}
+          </button>
+        </div>
         <section className="min-h-screen grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] md:grid-cols-[repeat(2,_minmax(300px,_1fr))] lg:grid-cols-[repeat(3,_minmax(300px,_1fr))] gap-4 auto-rows-[300px]">
-          {posts.length > 0 &&
-            posts.map((post) =>
-              post.published ? (
-                <div
-                  key={post.id}
-                  className="p-2 bg-white text-black rounded-md flex flex-col gap-3 shadow-md shadow-black"
-                >
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-custom font-bold">{post.title}</h3>
-                    {user.id === post.author.id ? (
-                      <button
-                        onClick={() => deletePost(post.id)}
-                        className="hover:text-red-600"
+          {posts.length > 0 && displayPublished
+            ? posts.map((post) =>
+                post.published ? (
+                  <div
+                    key={post.id}
+                    className="p-2 bg-white text-black rounded-md flex flex-col gap-3 shadow-md shadow-black"
+                  >
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-custom font-bold">{post.title}</h3>
+                      {user.id === post.author.id ? (
+                        <div className="flex gap-4 items-center">
+                          <button
+                            onClick={() => deletePost(post.id)}
+                            className="hover:text-red-600"
+                          >
+                            <svg
+                              className="size-6"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                              <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></g>
+                              <g id="SVGRepo_iconCarrier">
+                                {" "}
+                                <path
+                                  d="M6 7V18C6 19.1046 6.89543 20 8 20H16C17.1046 20 18 19.1046 18 18V7M6 7H5M6 7H8M18 7H19M18 7H16M10 11V16M14 11V16M8 7V5C8 3.89543 8.89543 3 10 3H14C15.1046 3 16 3.89543 16 5V7M8 7H16"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>{" "}
+                              </g>
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsEdit(true);
+                              setCurrentPost(post);
+                              openDialog();
+                            }}
+                          >
+                            <svg
+                              className="size-6 hover:text-green-700"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                              <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></g>
+                              <g id="SVGRepo_iconCarrier">
+                                {" "}
+                                <path
+                                  d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>{" "}
+                                <path
+                                  d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>{" "}
+                              </g>
+                            </svg>
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                    <p className="flex-1">{post.content}</p>
+                    <div className="flex items-center justify-between gap-5">
+                      <div>
+                        {new Date(post.createdAt).toLocaleDateString("en-GB")}
+                      </div>
+                      <div>
+                        {new Date(post.createdAt).toLocaleTimeString("en-GB", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        })}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-5">
+                      <div className="text-sm">{post.author.email}</div>
+                      <Link
+                        className="flex gap-1 items-center"
+                        to="/post"
+                        state={{ post }}
                       >
-                        <svg
+                        <img
                           className="size-6"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                          <g
-                            id="SVGRepo_tracerCarrier"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          ></g>
-                          <g id="SVGRepo_iconCarrier">
-                            {" "}
-                            <path
-                              d="M6 7V18C6 19.1046 6.89543 20 8 20H16C17.1046 20 18 19.1046 18 18V7M6 7H5M6 7H8M18 7H19M18 7H16M10 11V16M14 11V16M8 7V5C8 3.89543 8.89543 3 10 3H14C15.1046 3 16 3.89543 16 5V7M8 7H16"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            ></path>{" "}
-                          </g>
-                        </svg>
-                      </button>
-                    ) : null}
-                  </div>
-                  <p className="flex-1">{post.content}</p>
-                  <div className="flex items-center justify-between gap-5">
-                    <div>
-                      {new Date(post.createdAt).toLocaleDateString("en-GB")}
-                    </div>
-                    <div>
-                      {new Date(post.createdAt).toLocaleTimeString("en-GB", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: false,
-                      })}
+                          src={commentIcon}
+                          alt="comment icon"
+                        />
+                        <span className="text-xs">{post.comments.length}</span>
+                      </Link>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between gap-5">
-                    <div className="text-sm">{post.author.email}</div>
-                    <Link
-                      className="flex gap-1 items-center"
-                      to="/post"
-                      state={{ post }}
-                    >
-                      <img
-                        className="size-6"
-                        src={commentIcon}
-                        alt="comment icon"
-                      />
-                      <span className="text-xs">{post.comments.length}</span>
-                    </Link>
+                ) : null
+              )
+            : posts.map((post) =>
+                post.published ? null : (
+                  <div
+                    key={post.id}
+                    className="p-2 bg-white text-black rounded-md flex flex-col gap-3 shadow-md shadow-black"
+                  >
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-custom font-bold">{post.title}</h3>
+                      {user.id === post.author.id ? (
+                        <div className="flex gap-4 items-center">
+                          <button
+                            onClick={() => deletePost(post.id)}
+                            className="hover:text-red-600"
+                          >
+                            <svg
+                              className="size-6"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                              <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></g>
+                              <g id="SVGRepo_iconCarrier">
+                                {" "}
+                                <path
+                                  d="M6 7V18C6 19.1046 6.89543 20 8 20H16C17.1046 20 18 19.1046 18 18V7M6 7H5M6 7H8M18 7H19M18 7H16M10 11V16M14 11V16M8 7V5C8 3.89543 8.89543 3 10 3H14C15.1046 3 16 3.89543 16 5V7M8 7H16"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>{" "}
+                              </g>
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsEdit(true);
+                              setCurrentPost(post);
+                              openDialog();
+                            }}
+                          >
+                            <svg
+                              className="size-6 hover:text-green-700"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                              <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></g>
+                              <g id="SVGRepo_iconCarrier">
+                                {" "}
+                                <path
+                                  d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>{" "}
+                                <path
+                                  d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>{" "}
+                              </g>
+                            </svg>
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                    <p className="flex-1">{post.content}</p>
+                    <div className="flex items-center justify-between gap-5">
+                      <div>
+                        {new Date(post.createdAt).toLocaleDateString("en-GB")}
+                      </div>
+                      <div>
+                        {new Date(post.createdAt).toLocaleTimeString("en-GB", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        })}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-5">
+                      <div className="text-sm">{post.author.email}</div>
+                      <Link
+                        className="flex gap-1 items-center"
+                        to="/post"
+                        state={{ post }}
+                      >
+                        <img
+                          className="size-6"
+                          src={commentIcon}
+                          alt="comment icon"
+                        />
+                        <span className="text-xs">{post.comments.length}</span>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ) : null
-            )}
+                )
+              )}
         </section>
       </section>
     </main>
