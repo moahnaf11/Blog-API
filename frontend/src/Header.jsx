@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-function Header({ user, setUser }) {
+function Header({ user, setUser, displayPublished, setDisplayPublished }) {
   const id = user.id;
   function handleLogout() {
     localStorage.removeItem("token");
@@ -14,6 +14,7 @@ function Header({ user, setUser }) {
         role: "",
       };
     });
+    setDisplayPublished(true);
   }
   return (
     <>

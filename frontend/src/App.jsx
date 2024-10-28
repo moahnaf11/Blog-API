@@ -11,6 +11,7 @@ function App() {
     email: "",
     role: "",
   });
+  const [displayPublished, setDisplayPublished] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token"); // Assuming you stored the token as 'token'
@@ -33,8 +34,8 @@ function App() {
 
   return (
     <>
-      <Header user={user} setUser={setUser} />
-      <Outlet context={{ setUser, user }} />
+      <Header user={user} setUser={setUser} displayPublished={displayPublished} setDisplayPublished={setDisplayPublished} />
+      <Outlet context={{ setUser, user, displayPublished, setDisplayPublished }} />
     </>
   );
 }

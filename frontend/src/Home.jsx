@@ -2,10 +2,18 @@ import { useEffect, useState, useRef } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import commentIcon from "/comment.svg";
 function Home() {
-  const { user } = useOutletContext();
+  const { user, displayPublished, setDisplayPublished } = useOutletContext();
   const [posts, setPosts] = useState([]);
-  const [displayPublished, setDisplayPublished] = useState(true);
-  const [currentPost, setCurrentPost] = useState(null);
+  const [currentPost, setCurrentPost] = useState({
+    title: "",
+    content: "",
+    published: false,
+  });
+  const [newForm, setNewForm] = useState({
+    title: "",
+    content: "",
+    published: false,
+  });
   const [isEdit, setIsEdit] = useState(false);
   const dialogRef = useRef(null);
 
@@ -35,7 +43,26 @@ function Home() {
   }, []);
 
   const openDialog = () => dialogRef.current.showModal();
-  const closeDialog = () => dialogRef.current.close();
+  const closeDialog = () => {
+    dialogRef.current.close();
+  };
+
+  // function to set dialog form fields
+  const handleChange = async (e) => {
+    const { name, value, type, checked } = e.target;
+
+    if (isEdit) {
+      setCurrentPost((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    } else {
+      setNewForm((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
+  };
 
   // Function to delete a post
   const deletePost = async (postId) => {
@@ -73,17 +100,11 @@ function Home() {
     closeDialog();
     const token = localStorage.getItem("token");
 
-    const title = e.target.title.value;
-    const content = e.target.content.value;
-    const published = e.target.published.checked ? "true" : "false";
-
-    const body = {
-      title,
-      content,
-      published,
-    };
-
     if (!isEdit) {
+      const body = {
+        ...newForm,
+        published: newForm.published ? "true" : "false",
+      };
       try {
         const response = await fetch(`http://localhost:3000/posts`, {
           method: "POST",
@@ -104,7 +125,47 @@ function Home() {
       }
     } else {
       // update post
+      const body = {
+        ...currentPost,
+        published: currentPost.published ? "true" : "false",
+      };
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch(
+          `http://localhost:3000/posts/${currentPost.id}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          }
+        );
+
+        if (response.ok) {
+          const updatedPost = await response.json();
+          console.log("updated post", updatedPost);
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+              post.id === currentPost.id ? updatedPost : post
+            )
+          );
+        } else {
+          console.log("Failed to update the post");
+        }
+      } catch (error) {
+        console.error("Error updating the post", error);
+      }
     }
+  };
+
+  const handleClear = () => {
+    setCurrentPost({
+      title: "",
+      content: "",
+      published: false,
+    });
   };
 
   return (
@@ -118,7 +179,6 @@ function Home() {
             <button
               onClick={() => {
                 setIsEdit(false);
-                setCurrentPost(null);
                 openDialog();
               }}
               className="border shrink-0 hover:bg-white hover:text-black font-bold font-custom text-xs border-white px-1 py-2 sm:px-3 sm:text-[16px] rounded-full"
@@ -133,13 +193,18 @@ function Home() {
         <form
           action="#"
           onSubmit={(e) => handleSubmitPost(e)}
+          onReset={handleClear}
           className="flex flex-col gap-4 p-3"
         >
           <div className="flex justify-between items-center">
             <h2 className="font-custom font-bold mb-4">
               {isEdit ? "Update Blog Post" : "Create New Blog Post"}
             </h2>
-            <button onClick={closeDialog} className="hover:text-red-600">
+            <button
+              type="button"
+              onClick={closeDialog}
+              className="hover:text-red-600"
+            >
               <svg
                 className="size-6"
                 viewBox="0 0 24 24"
@@ -170,12 +235,13 @@ function Home() {
               Title <span className="text-red-600">*</span>
             </label>
             <input
+              onChange={(e) => handleChange(e)}
               className="border py-1 border-black px-1"
               type="text"
               name="title"
               id="title"
               placeholder="title"
-              defaultValue={currentPost ? currentPost.title : ""}
+              value={isEdit ? currentPost.title : newForm.title}
               required
             />
           </div>
@@ -185,10 +251,11 @@ function Home() {
               Content <span className="text-red-600">*</span>
             </label>
             <textarea
+              onChange={(e) => handleChange(e)}
               className="border py-1 border-black px-1"
               name="content"
               id="content"
-              defaultValue={currentPost ? currentPost.content : ""}
+              value={isEdit ? currentPost.content : newForm.content}
               required
             ></textarea>
           </div>
@@ -200,17 +267,26 @@ function Home() {
               type="checkbox"
               name="published"
               id="published"
-              checked={currentPost ? currentPost.published : false}
+              checked={isEdit ? currentPost.published : newForm.published}
+              onChange={(e) => handleChange(e)}
             />
           </div>
 
-          <div className="flex">
+          <div className="flex gap-7">
             <button
               className="flex-1 py-2 rounded-full font-bold font-custom hover:bg-white bg-green-600 border border-green-600"
               type="submit"
             >
               {isEdit ? "Update Post" : "Add Post"}
             </button>
+            {isEdit ? (
+              <button
+                className="flex-1 font-bold font-custom py-2 border bg bg-gray-500 border-gray-500 hover:bg-white rounded-full"
+                type="reset"
+              >
+                Clear
+              </button>
+            ) : null}
           </div>
         </form>
       </dialog>
@@ -218,14 +294,16 @@ function Home() {
       <section className="min-h-screen p-3">
         <div className="flex mb-5 justify-between items-center">
           <h2 className="font-custom font-bold">All Blogs</h2>
-          <button
-            className="border px-3 py-2 rounded-full text-sm shrink-0 font-custom font-bold"
-            onClick={() => setDisplayPublished((prev) => !prev)}
-          >
-            {displayPublished
-              ? "View Unpublished Posts"
-              : "View Published Posts"}
-          </button>
+          {user.id && (
+            <button
+              className="border px-3 py-2 rounded-full text-sm shrink-0 font-custom font-bold"
+              onClick={() => setDisplayPublished((prev) => !prev)}
+            >
+              {displayPublished
+                ? "View Unpublished Posts"
+                : "View Published Posts"}
+            </button>
+          )}
         </div>
         <section className="min-h-screen grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] md:grid-cols-[repeat(2,_minmax(300px,_1fr))] lg:grid-cols-[repeat(3,_minmax(300px,_1fr))] gap-4 auto-rows-[300px]">
           {posts.length > 0 && displayPublished
@@ -339,8 +417,9 @@ function Home() {
                   </div>
                 ) : null
               )
-            : posts.map((post) =>
-                post.published ? null : (
+            : posts
+                .filter((post) => !post.published && user.id === post.author.id)
+                .map((post) => (
                   <div
                     key={post.id}
                     className="p-2 bg-white text-black rounded-md flex flex-col gap-3 shadow-md shadow-black"
@@ -447,8 +526,7 @@ function Home() {
                       </Link>
                     </div>
                   </div>
-                )
-              )}
+                ))}
         </section>
       </section>
     </main>
