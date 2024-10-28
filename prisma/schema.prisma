@@ -48,6 +48,7 @@ model Comment {
   postId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+  updatedAt DateTime  @updatedAt @default(now())
 
   @@map("comments")
 }

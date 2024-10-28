@@ -47,6 +47,7 @@ const createNewPost = async (id, title, content, published) => {
     },
     include: {
       author: true,
+      comments: true,
     },
   });
   console.log("new post", post);

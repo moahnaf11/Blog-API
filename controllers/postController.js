@@ -7,7 +7,7 @@ import {
 } from "../prisma/postQueries.js";
 
 const getPosts = async (req, res) => {
-  console.log("get called")
+  console.log("get called");
   const posts = await getAllPosts();
   if (!posts.length) {
     return res.status(404).json({ error: "no posts" });
@@ -42,11 +42,12 @@ const updatePost = async (req, res) => {
   }
   if (post.userId === userId) {
     const { title, content, published } = req.body;
+    const isPublished = published === "true";
     const updatedPost = await updateUserPost(
       req.params.id,
       title,
       content,
-      published
+      isPublished
     );
     res.json(updatedPost);
   } else {

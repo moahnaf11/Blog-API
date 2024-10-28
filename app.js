@@ -7,7 +7,13 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors()); // Enable CORS for all routes
+const allowedOrigin = 'https://mybloghaven.netlify.app';
+
+app.use(cors({
+  origin: allowedOrigin,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
