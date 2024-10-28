@@ -44,9 +44,15 @@ function ViewPost() {
     });
   };
 
-  const openDialog = () => commentDialogRef.current.showModal();
+  const openDialog = () => {
+    commentDialogRef.current.showModal();
+    commentDialogRef.current.classList.add("show");
+  };
   const closeDialog = () => {
-    commentDialogRef.current.close();
+    commentDialogRef.current.classList.remove("show");
+    setTimeout(() => {
+      commentDialogRef.current.close();
+    }, 300);
   };
 
   async function handleDelete(id) {
@@ -245,14 +251,14 @@ function ViewPost() {
 
           <div className="flex gap-7">
             <button
-              className="flex-1 py-2 rounded-full font-bold font-custom hover:bg-white bg-green-600 border border-green-600"
+              className="flex-1 text-xs sm:text-[16px] py-2 rounded-full font-bold font-custom hover:bg-white bg-green-600 border border-green-600"
               type="submit"
             >
               {isEdit ? "Update Comment" : "Add Comment"}
             </button>
             {isEdit ? (
               <button
-                className="flex-1 font-bold font-custom py-2 border bg bg-gray-500 border-gray-500 hover:bg-white rounded-full"
+                className="flex-1 text-xs sm:text-[16px] font-bold font-custom py-2 border bg bg-gray-500 border-gray-500 hover:bg-white rounded-full"
                 type="reset"
               >
                 Clear

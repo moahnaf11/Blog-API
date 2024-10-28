@@ -13,3 +13,17 @@
   background-color: gray;
   opacity: 0.7;
 }
+
+dialog {
+  transform: translateY(-300%);
+  transition: transform 300ms ease-out;
+}
+
+dialog.show {
+  transform: translateY(0);
+}
+
+a.active {
+  background-color: white;
+}
+
