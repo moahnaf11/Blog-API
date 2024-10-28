@@ -179,6 +179,11 @@ function Home() {
             <button
               onClick={() => {
                 setIsEdit(false);
+                setNewForm({
+                  title: "",
+                  content: "",
+                  published: false,
+                });
                 openDialog();
               }}
               className="border shrink-0 hover:bg-white hover:text-black font-bold font-custom text-xs border-white px-1 py-2 sm:px-3 sm:text-[16px] rounded-full"
@@ -387,18 +392,48 @@ function Home() {
                       ) : null}
                     </div>
                     <p className="flex-1">{post.content}</p>
-                    <div className="flex items-center justify-between gap-5">
-                      <div>
-                        {new Date(post.createdAt).toLocaleDateString("en-GB")}
-                      </div>
-                      <div>
-                        {new Date(post.createdAt).toLocaleTimeString("en-GB", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
-                        })}
+                    <div className="flex flex-col">
+                      <div className="text-xs">posted</div>
+                      <div className="flex items-center justify-between gap-5">
+                        <div>
+                          {new Date(post.createdAt).toLocaleDateString("en-GB")}
+                        </div>
+                        <div>
+                          {new Date(post.createdAt).toLocaleTimeString(
+                            "en-GB",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: false,
+                            }
+                          )}
+                        </div>
                       </div>
                     </div>
+                    {/* edited at timestamp */}
+
+                    {post.createdAt !== post.updatedAt && (
+                      <div className="flex flex-col">
+                        <div className="text-xs">edited</div>
+                        <div className="flex items-center justify-between gap-5">
+                          <div>
+                            {new Date(post.updatedAt).toLocaleDateString(
+                              "en-GB"
+                            )}
+                          </div>
+                          <div>
+                            {new Date(post.updatedAt).toLocaleTimeString(
+                              "en-GB",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              }
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between gap-5">
                       <div className="text-sm">{post.author.email}</div>
                       <Link
@@ -498,18 +533,48 @@ function Home() {
                       ) : null}
                     </div>
                     <p className="flex-1">{post.content}</p>
-                    <div className="flex items-center justify-between gap-5">
-                      <div>
-                        {new Date(post.createdAt).toLocaleDateString("en-GB")}
-                      </div>
-                      <div>
-                        {new Date(post.createdAt).toLocaleTimeString("en-GB", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
-                        })}
+                    <div className="flex flex-col">
+                      <div className="text-xs">posted</div>
+                      <div className="flex items-center justify-between gap-5">
+                        <div>
+                          {new Date(post.createdAt).toLocaleDateString("en-GB")}
+                        </div>
+                        <div>
+                          {new Date(post.createdAt).toLocaleTimeString(
+                            "en-GB",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: false,
+                            }
+                          )}
+                        </div>
                       </div>
                     </div>
+                    {/* edited at timestamp */}
+
+                    {post.createdAt !== post.updatedAt && (
+                      <div className="flex flex-col">
+                        <div className="text-xs">edited</div>
+                        <div className="flex items-center justify-between gap-5">
+                          <div>
+                            {new Date(post.updatedAt).toLocaleDateString(
+                              "en-GB"
+                            )}
+                          </div>
+                          <div>
+                            {new Date(post.updatedAt).toLocaleTimeString(
+                              "en-GB",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              }
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between gap-5">
                       <div className="text-sm">{post.author.email}</div>
                       <Link
