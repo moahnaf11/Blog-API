@@ -325,7 +325,9 @@ function Home() {
                     className="p-2 bg-white text-black rounded-md flex flex-col gap-3 shadow-md shadow-black"
                   >
                     <div className="flex justify-between items-center">
-                      <h3 className="font-custom font-bold">{post.title}</h3>
+                      <h3 className="sm:max-h-[40px] break-words text-ellipsis overflow-hidden font-custom font-bold">
+                        {post.title}
+                      </h3>
                       {user.id === post.author.id ? (
                         <div className="flex gap-4 items-center">
                           <button
@@ -465,8 +467,10 @@ function Home() {
                     key={post.id}
                     className="p-2 bg-white text-black rounded-md flex flex-col gap-3 shadow-md shadow-black"
                   >
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-custom font-bold">{post.title}</h3>
+                    <div className="flex justify-between gap-4 items-center">
+                      <h3 className="font-custom sm:max-h-[24px] break-words text-ellipsis overflow-hidden font-bold">
+                        {post.title}
+                      </h3>
                       {user.id === post.author.id ? (
                         <div className="flex gap-4 items-center">
                           <button

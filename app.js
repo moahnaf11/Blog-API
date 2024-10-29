@@ -7,13 +7,15 @@ import cors from "cors";
 
 const app = express();
 
-const allowedOrigin = 'https://mybloghaven.netlify.app';
+const allowedOrigin = "https://mybloghaven.netlify.app";
 
-app.use(cors({
-  origin: allowedOrigin,
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-}));
+// app.use(cors({
+//   origin: allowedOrigin,
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//   credentials: true,
+// }));
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
