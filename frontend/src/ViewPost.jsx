@@ -65,7 +65,7 @@ function ViewPost() {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `http://localhost:3000/posts/${post.id}/comments/${id}`,
+        `https://blog-api-production-f0e5.up.railway.app/posts/${post.id}/comments/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -100,7 +100,7 @@ function ViewPost() {
       };
       try {
         const response = await fetch(
-          `http://localhost:3000/posts/${post.id}/comments`,
+          `https://blog-api-production-f0e5.up.railway.app/posts/${post.id}/comments`,
           {
             method: "POST",
             headers: {
@@ -127,7 +127,7 @@ function ViewPost() {
       const token = localStorage.getItem("token");
       try {
         const response = await fetch(
-          `http://localhost:3000/posts/${post.id}/comments/${currentComment.id}`,
+          `https://blog-api-production-f0e5.up.railway.app/posts/${post.id}/comments/${currentComment.id}`,
           {
             method: "PUT",
             headers: {

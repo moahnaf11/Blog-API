@@ -22,7 +22,7 @@ function Home() {
     const signal = controller.signal;
     async function fetchPosts() {
       try {
-        const response = await fetch("http://localhost:3000/posts", {
+        const response = await fetch("https://blog-api-production-f0e5.up.railway.app/posts", {
           method: "GET",
           signal,
         });
@@ -80,7 +80,7 @@ function Home() {
     }
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:3000/posts/${postId}`, {
+      const response = await fetch(`https://blog-api-production-f0e5.up.railway.app/posts/${postId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -112,7 +112,7 @@ function Home() {
         published: newForm.published ? "true" : "false",
       };
       try {
-        const response = await fetch(`http://localhost:3000/posts`, {
+        const response = await fetch(`https://blog-api-production-f0e5.up.railway.app/posts`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -138,7 +138,7 @@ function Home() {
       const token = localStorage.getItem("token");
       try {
         const response = await fetch(
-          `http://localhost:3000/posts/${currentPost.id}`,
+          `https://blog-api-production-f0e5.up.railway.app/posts/${currentPost.id}`,
           {
             method: "PUT",
             headers: {
