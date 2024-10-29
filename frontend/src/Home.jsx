@@ -305,7 +305,7 @@ function Home() {
       <section className="min-h-screen p-3">
         <div className="flex mb-5 justify-between items-center">
           <h2 className="font-custom font-bold">All Blogs</h2>
-          {user.id && (
+          {user.id && user.role === "AUTHOR" && (
             <button
               className="border px-3 py-2 rounded-full text-sm shrink-0 font-custom font-bold"
               onClick={() => setDisplayPublished((prev) => !prev)}
