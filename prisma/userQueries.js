@@ -58,4 +58,4 @@ const deleteUser = async (id) => {
   console.log("deleted user", user);
 };
 
-export { getUser, addUser, getUserProfile, updateUser, deleteUser,  };
+export { getUser, addUser, getUserProfile, updateUser, deleteUser };

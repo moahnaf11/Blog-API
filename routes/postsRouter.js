@@ -37,4 +37,4 @@ postRouter.put("/:id", authenticateToken, checkRole, updatePost);
 // delete a post (post owner only)
 postRouter.delete("/:id", authenticateToken, checkRole, deletePost);
 
-export { postRouter };
+export { postRouter, checkRole };
