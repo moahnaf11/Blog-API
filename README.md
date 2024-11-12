@@ -9,3 +9,5 @@ Stored the token in the client allowing user to connect to the backend server ef
 Implemented logic allowing the user to register and login as an AUTHOR or a USER. Authors are able to CRUD blog posts and CRUD comments. Users are able to view blog posts and CRUD comments on posts.
 
 Implemented all database queries using Prisma.
+
+Conducted comprehensive integration tests on all routes, controllers, and database operations using Supertest and Jest to ensure optimal application performance and reliability.
